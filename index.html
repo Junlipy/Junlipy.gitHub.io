@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>梦幻占卜 - 星语心愿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+  <style>
+    :root {
+      --dream-pink: #ffb6c1;
+      --dream-purple: #dda0dd;
+      --dream-blue: #87ceeb;
+      --dream-lavender: #e6e6fa;
+      --dream-gold: #ffd700;
+      --dream-white: #fffafa;
+      --text-dark: #4a4063;
+      --glass-bg: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Serif SC', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #1a0a2e 0%, #16213e 25%, #1a1a3e 50%, #2d1b4e 75%, #1a0a2e 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* 星星背景 */
+    .stars-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--duration) ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--opacity); transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* 月亮 */
+    .moon {
+      position: fixed;
+      top: 10%;
+      right: 10%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle at 30% 30%, #fffacd, #f0e68c, #daa520);
+      border-radius: 50%;
+      box-shadow:
+        0 0 60px rgba(255, 215, 0, 0.5),
+        0 0 120px rgba(255, 215, 0, 0.3),
+        inset -15px -15px 30px rgba(0,0,0,0.1);
+      z-index: 0;
+      animation: moonGlow 4s ease-in-out infinite;
+    }
+
+    .moon::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: 25%;
+      width: 15px;
+      height: 15px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 50%;
+    }
+
+    .moon::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 40%;
+      width: 25px;
+      height: 25px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 50%;
+    }
+
+    @keyframes moonGlow {
+      0%, 100% { box-shadow: 0 0 60px rgba(255, 215, 0, 0.5), 0 0 120px rgba(255, 215, 0, 0.3); }
+      50% { box-shadow: 0 0 80px rgba(255, 215, 0, 0.7), 0 0 150px rgba(255, 215, 0, 0.4); }
+    }
+
+    /* 流星 */
+    .shooting-star {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: linear-gradient(45deg, white, transparent);
+      border-radius: 50%;
+      animation: shoot linear infinite;
+      z-index: 0;
+    }
+
+    .shooting-star::before {
+      content: '';
+      position: absolute;
+      width: 100px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.8), transparent);
+      transform: translateX(-100%);
+    }
+
+    @keyframes shoot {
+      0% { transform: translateX(0) translateY(0); opacity: 1; }
+      70% { opacity: 1; }
+      100% { transform: translateX(500px) translateY(500px); opacity: 0; }
+    }
+
+    /* 气泡 */
+    .bubble {
+      position: fixed;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(135,206,235,0.3));
+      animation: floatBubble linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes floatBubble {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    /* 主容器 */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 玻璃态卡片 */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 50px 35px;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 0 80px rgba(255, 255, 255, 0.1);
+      width: 100%;
+    }
+
+    /* 标题区域 */
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .moon-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .title {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 2.8rem;
+      background: linear-gradient(135deg, var(--dream-pink), var(--dream-purple), var(--dream-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-family: 'Ma Shan Zheng', cursive;
+      font-size: 1.2rem;
+      color: var(--dream-lavender);
+      letter-spacing: 0.3em;
+      opacity: 0.9;
+    }
+
+    /* 装饰线 */
+    .sparkle-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 25px 0;
+    }
+
+    .sparkle {
+      color: var(--dream-gold);
+      font-size: 0.8rem;
+      animation: sparkle 1.5s ease-in-out infinite;
+    }
+
+    .sparkle:nth-child(2) { animation-delay: 0.2s; }
+    .sparkle:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .sparkle-line::before,
+    .sparkle-line::after {
+      content: '✧';
+      color: var(--dream-gold);
+      opacity: 0.5;
+    }
+
+    /* 表单 */
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: var(--dream-lavender);
+      margin-bottom: 10px;
+    }
+
+    .form-icon {
+      width: 20px;
+      height: 20px;
+      opacity: 0.8;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 20px;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      color: white;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--dream-pink);
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(255, 182, 193, 0.3);
+    }
+
+    .form-input.error {
+      border-color: #ff6b6b;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .error-text {
+      color: #ff9999;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      padding-left: 10px;
+      display: none;
+    }
+
+    .error-text.visible {
+      display: block;
+    }
+
+    /* 按钮 */
+    .btn {
+      width: 100%;
+      padding: 18px 30px;
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 0.15em;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--dream-pink), var(--dream-purple));
+      color: white;
+      box-shadow: 0 5px 25px rgba(221, 160, 221, 0.5);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 40px rgba(221, 160, 221, 0.6);
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: rotate(45deg);
+      transition: 0.6s;
+      opacity: 0;
+    }
+
+    .btn-primary:hover::before {
+      opacity: 1;
+      left: 100%;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--dream-lavender);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-top: 15px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-icon {
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    /* 分隔符 */
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+      color: var(--dream-lavender);
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+
+    .divider span {
+      padding: 0 15px;
+    }
+
+    /* 底部装饰 */
+    .footer-deco {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 1.5rem;
+      opacity: 0.6;
+    }
+
+    .footer-deco span {
+      display: inline-block;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .footer-deco span:nth-child(2) { animation-delay: 0.2s; }
+    .footer-deco span:nth-child(3) { animation-delay: 0.4s; }
+    .footer-deco span:nth-child(4) { animation-delay: 0.6s; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* 视图切换 */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+      animation: fadeUp 0.6s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 加载视图 */
+    .loading-view {
+      text-align: center;
+      padding: 60px 0;
+    }
+
+    .magic-circle {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+
+    .magic-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid transparent;
+    }
+
+    .magic-ring:nth-child(1) {
+      width: 100%;
+      height: 100%;
+      border-top-color: var(--dream-pink);
+      border-right-color: var(--dream-pink);
+      animation: spin 2s linear infinite;
+    }
+
+    .magic-ring:nth-child(2) {
+      width: 85%;
+      height: 85%;
+      top: 7.5%;
+      left: 7.5%;
+      border-top-color: var(--dream-purple);
+      border-left-color: var(--dream-purple);
+      animation: spin 1.5s linear infinite reverse;
+    }
+
+    .magic-ring:nth-child(3) {
+      width: 70%;
+      height: 70%;
+      top: 15%;
+      left: 15%;
+      border-top-color: var(--dream-blue);
+      border-bottom-color: var(--dream-blue);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .magic-star {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.2) rotate(15deg); }
+    }
+
+    .loading-text {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 1.8rem;
+      color: var(--dream-lavender);
+      letter-spacing: 0.2em;
+    }
+
+    .loading-dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0% { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75%, 100% { content: '...'; }
+    }
+
+    /* 结果视图 */
+    .result-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .result-date {
+      font-family: 'Ma Shan Zheng', cursive;
+      font-size: 1rem;
+      color: var(--dream-lavender);
+      opacity: 0.8;
+    }
+
+    /* 运气印章 */
+    .luck-crystal {
+      width: 200px;
+      height: 200px;
+      margin: 25px auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .crystal-bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .crystal-shine {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.3), transparent);
+      border-radius: 50%;
+      animation: crystalRotate 8s linear infinite;
+    }
+
+    @keyframes crystalRotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .crystal-inner {
+      position: relative;
+      width: 75%;
+      height: 75%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255,255,255,0.4);
+      box-shadow:
+        0 0 30px rgba(255, 182, 193, 0.4),
+        inset 0 0 30px rgba(255,255,255,0.2);
+    }
+
+    .luck-name {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 3rem;
+      color: white;
+      text-shadow: 0 0 20px currentColor;
+    }
+
+    .luck-sub {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.8);
+      margin-top: 5px;
+      letter-spacing: 0.2em;
+    }
+
+    /* 水晶球卡片 */
+    .glass-card-inner {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 1.3rem;
+      text-align: center;
+      color: var(--dream-gold);
+      margin-bottom: 15px;
+    }
+
+    .info-row {
+      display: flex;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      width: 50px;
+      color: var(--dream-lavender);
+      opacity: 0.8;
+    }
+
+    .info-value {
+      flex: 1;
+      color: white;
+    }
+
+    .info-yi {
+      color: #98fb98;
+    }
+
+    .info-ji {
+      color: #ffb6c1;
+    }
+
+    /* 运势解读 */
+    .fortune-crystal {
+      position: relative;
+      background: linear-gradient(135deg, rgba(221, 160, 221, 0.2), rgba(135, 206, 235, 0.2));
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      padding: 25px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .fortune-crystal::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: translateX(-100%) rotate(45deg); }
+      50% { transform: translateX(100%) rotate(45deg); }
+    }
+
+    .fortune-header {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fortune-user {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 1.6rem;
+      color: var(--dream-gold);
+    }
+
+    .fortune-content {
+      position: relative;
+      z-index: 1;
+      line-height: 2;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 0.95rem;
+      text-align: justify;
+      margin-top: 15px;
+    }
+
+    /* 详细信息 */
+    .details-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .detail-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 15px 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .detail-card:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .detail-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      color: var(--dream-lavender);
+      opacity: 0.8;
+    }
+
+    .detail-value {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 1.1rem;
+      color: white;
+      margin-top: 5px;
+    }
+
+    /* 时辰 */
+    .hour-section {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .hour-title {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 1.1rem;
+      text-align: center;
+      color: var(--dream-gold);
+      margin-bottom: 12px;
+    }
+
+    .hour-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .hour-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px 5px;
+      text-align: center;
+    }
+
+    .hour-time {
+      font-size: 0.7rem;
+      color: var(--dream-lavender);
+      opacity: 0.7;
+    }
+
+    .hour-luck {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 0.9rem;
+      margin-top: 3px;
+    }
+
+    .hour-good { color: #98fb98; }
+    .hour-bad { color: #ffb6c1; }
+
+    /* 装饰 */
+    .magical-symbols {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      opacity: 0.6;
+    }
+
+    .magical-symbols span {
+      display: inline-block;
+      margin: 0 8px;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    /* 响应式 */
+    @media (max-width: 480px) {
+      .glass-card {
+        padding: 35px 25px;
+      }
+
+      .title {
+        font-size: 2.2rem;
+      }
+
+      .details-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hour-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .luck-name {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 星星背景 -->
+  <div class="stars-container" id="stars"></div>
+
+  <!-- 月亮 -->
+  <div class="moon"></div>
+
+  <!-- 流星 -->
+  <div id="shooting-stars"></div>
+
+  <!-- 气泡 -->
+  <div id="bubbles"></div>
+
+  <div class="container">
+    <div class="glass-card">
+      <!-- 输入视图 -->
+      <div id="input-view" class="view active">
+        <div class="header">
+          <div class="moon-icon">🌙</div>
+          <h1 class="title">梦幻占卜</h1>
+          <p class="subtitle">星语心愿 · 知晓今日运势</p>
+        </div>
+
+        <div class="sparkle-line">
+          <span class="sparkle">✦</span>
+          <span class="sparkle">✧</span>
+          <span class="sparkle">✦</span>
+          <span class="sparkle">✧</span>
+        </div>
+
+        <form id="fortune-form">
+          <div class="form-group">
+            <label class="form-label">
+              <svg class="form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              你的名字
+            </label>
+            <input
+              type="text"
+              id="user-name"
+              class="form-input"
+              placeholder="请输入你的名字"
+              maxlength="10"
+              autocomplete="off"
+            >
+            <p class="error-text" id="name-error">请输入你的名字哦~</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <svg class="form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              出生日期
+            </label>
+            <input
+              type="date"
+              id="user-birthday"
+              class="form-input"
+            >
+            <p class="error-text" id="birthday-error">请选择你的生日~</p>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <span class="btn-icon">✨</span>
+            开始占卜
+          </button>
+        </form>
+
+        <div class="divider"><span>或者</span></div>
+
+        <button type="button" id="anonymous-btn" class="btn btn-secondary">
+          <span class="btn-icon">🌟</span>
+          匿名小游客占卜
+        </button>
+
+        <div class="footer-deco">
+          <span>🌸</span>
+          <span>💫</span>
+          <span>🌙</span>
+          <span>⭐</span>
+        </div>
+      </div>
+
+      <!-- 加载视图 -->
+      <div id="loading-view" class="view">
+        <div class="loading-view">
+          <div class="magic-circle">
+            <div class="magic-ring"></div>
+            <div class="magic-ring"></div>
+            <div class="magic-ring"></div>
+            <span class="magic-star">🔮</span>
+          </div>
+          <p class="loading-text">星尘排列中<span class="loading-dots"></span></p>
+        </div>
+      </div>
+
+      <!-- 结果视图 -->
+      <div id="result-view" class="view">
+        <div class="result-header">
+          <p class="result-date" id="result-date">星辰历 · 2026年</p>
+        </div>
+
+        <div class="luck-crystal">
+          <div class="crystal-bg">
+            <svg viewBox="0 0 200 200" fill="none">
+              <defs>
+                <linearGradient id="crystalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" id="glow1" style="stop-color:#ffb6c1"/>
+                  <stop offset="100%" id="glow2" style="stop-color:#dda0dd"/>
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="95" stroke="url(#crystalGrad)" stroke-width="3" fill="none"/>
+              <circle cx="100" cy="100" r="85" stroke="url(#crystalGrad)" stroke-width="1" fill="none" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="crystal-shine"></div>
+          <div class="crystal-inner">
+            <span class="luck-name" id="luck-name">大吉</span>
+            <span class="luck-sub">今日运势</span>
+          </div>
+        </div>
+
+        <div class="glass-card-inner">
+          <h3 class="card-title">☽ 今日星象</h3>
+          <div class="info-row">
+            <span class="info-label">日期</span>
+            <span class="info-value" id="info-date"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">宜行</span>
+            <span class="info-value info-yi" id="info-yi"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">忌做</span>
+            <span class="info-value info-ji" id="info-ji"></span>
+          </div>
+        </div>
+
+        <div class="fortune-crystal">
+          <div class="fortune-header">
+            <span class="fortune-user" id="fortune-user">小可爱</span>
+          </div>
+          <p class="fortune-content" id="fortune-text"></p>
+        </div>
+
+        <div class="details-row">
+          <div class="detail-card">
+            <div class="detail-icon">🧭</div>
+            <div class="detail-label">幸运方位</div>
+            <div class="detail-value" id="detail-dir">东方</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">🎨</div>
+            <div class="detail-label">幸运色彩</div>
+            <div class="detail-value" id="detail-color">梦幻紫</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">🔢</div>
+            <div class="detail-label">幸运数字</div>
+            <div class="detail-value" id="detail-num">3, 7</div>
+          </div>
+        </div>
+
+        <div class="hour-section">
+          <h3 class="hour-title">⏰ 十二时辰运势</h3>
+          <div class="hour-grid" id="hour-grid"></div>
+        </div>
+
+        <div class="magical-symbols">
+          <span>🌟</span>
+          <span>✨</span>
+          <span>💫</span>
+          <span>⭐</span>
+          <span>✨</span>
+        </div>
+
+        <button type="button" id="replay-btn" class="btn btn-primary">
+          <span class="btn-icon">🌙</span>
+          再占一次
+        </button>
+
+        <div class="footer-deco">
+          <span>🌸</span>
+          <span>💫</span>
+          <span>🌙</span>
+          <span>⭐</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 运气等级
+    const luckLevels = [
+      { name: '大吉', color1: '#ffd700', color2: '#ffb347' },
+      { name: '中吉', color1: '#98fb98', color2: '#90ee90' },
+      { name: '小吉', color1: '#87ceeb', color2: '#add8e6' },
+      { name: '吉', color1: '#dda0dd', color2: '#da90dd' },
+      { name: '末吉', color1: '#f0e68c', color2: '#eee8aa' },
+      { name: '凶', color1: '#d3d3d3', color2: '#c0c0c0' },
+      { name: '大凶', color1: '#ffb6c1', color2: '#ff9999' }
+    ];
+
+    // 宜事项
+    const suitable = [
+      '出行游玩', '约会表白', 'Shopping', '结交新友', '表白心意',
+      '学习新知', '健身运动', '整理房间', '烹饪美食', '追剧放松',
+      '听音乐', '画画创作', '养宠物', '种花草', '冥想放松'
+    ];
+
+    // 忌事项
+    const avoid = [
+      '宅家发呆', '暴饮暴食', '熬夜追剧', '争吵冷战', '斤斤计较',
+      '消极怠工', '犹豫不决', '闭门不出', '暴跳如雷', '胡乱花钱'
+    ];
+
+    // 颜色
+    const colors = ['梦幻紫', '少女粉', '天空蓝', '薄荷绿', '香芋紫', '珊瑚橙', '奶油白'];
+
+    // 方位
+    const directions = ['东方', '南方', '西方', '北方', '东南', '东北', '西南', '西北'];
+
+    // 时辰
+    const hours = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+    // 哈希
+    function hash(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = ((h << 5) - h) + str.charCodeAt(i);
+        h = h & h;
+      }
+      return Math.abs(h);
+    }
+
+    // 洗牌
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // 随机数
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 运势文字
+    function genFortune(name, luck) {
+      const texts = {
+        0: [
+          `${name}，今天的星星格外眷顾你！贵人运爆棚，做什么都顺顺利利。感情上可能会有意想不到的甜蜜邂逅，财运也是直线上升，买彩票说不定都能中个小奖！不过别太得意，还是要低调行事哦~`,
+          `哇哦~ ${name}今天简直是被幸运之神亲吻的一天！工作上有什么想法尽管大胆提出来，领导一定会欣赏你的创意。单身的朋友们今天魅力四射，很可能遇到心仪的对象！`,
+          `${name}今天的运势简直完美！清晨醒来就能量满满，整个人的状态都超级好。适合做任何决定，因为今天的你直觉超准！记得把握机会，许下的愿望很可能会实现呢~`
+        ],
+        1: [
+          `${name}今天福气满满，好事即将发生！工作上会有小小的突破，让你信心大增。感情方面，和身边人的相处会特别愉快，单身者有机会遇到有趣的灵魂~`,
+          `${name}今天的你就像一颗闪亮的星星，走到哪儿都是焦点！运势稳步上升，不管是学习还是工作都能有不错的收获。记得多微笑，好运会传染的哦~`,
+          `今天的${name}也是元气满满的呢！人际关系特别顺畅，和朋友、家人的相处都很融洽。有什么想做的事就大胆去做吧，今天的行动力可是很强的！`
+        ],
+        2: [
+          `${name}今天的运气还不错哦~ 虽然不是大惊喜，但小确幸会不断出现。保持好心情，细节之处都能发现美好。记得给自己一个小奖励，感谢努力生活的自己~`,
+          `${name}今天适合稳扎稳打地前进！虽然没有什么大动作，但每一步都很踏实。享受当下的平静，也是一种幸福呢。可以抽空整理一下房间，让环境带来好心情~`,
+          `今天的${name}会收获一些小惊喜~ 可能是朋友的一个问候，或者路上看到的美景。工作上虽然会遇到小挑战，但都能顺利解决。保持乐观，好运自然来~`
+        ],
+        3: [
+          `${name}今天总体平稳，是平凡又美好的一天。不需要太多期待，也不会有太多失望。用心感受生活中的小美好，一杯热茶、一首好歌，都是今天的幸运~`,
+          `今天的${name}适合静下心来。运势虽然普通，但心境可以很不平凡。放下焦虑，享受当下，你会发现生活中处处有惊喜~`,
+          `${name}今天是养精蓄锐的好日子。运势平稳，没有大风大浪，适合做一些日常的事情。给自己泡杯热饮，看看窗外的风景，让心灵也休息一下吧~`
+        ],
+        4: [
+          `${name}今天需要多一点耐心哦~ 可能会遇到一些小波折，但不要灰心，先苦后甜才是人生的常态。保持微笑，阳光总在风雨后~`,
+          `今天的${name}可能会感觉有点不顺，但这都是在为明天的幸运铺垫呢！遇到困难不要急躁，换个角度思考，也许会有新的发现~`,
+          `${name}今天运势稍弱，但也是成长进步的机会。可能会有些小挫折，但这些都是人生的调味剂。保持积极的心态，好运很快就会回来的~`
+        ],
+        5: [
+          `${name}今天的运势有点低落，要小心行事哦~ 可能会遇到一些小麻烦，记得冷静处理，不要冲动。尽量避免做重大决定，今天适合休息和调整~`,
+          `今天的${name}可能会感觉诸事不顺，但这都是暂时的。给自己放个假，不要给自己太大压力。今天的阴霾会在明天散去，好运会重新降临~`,
+          `${name}今天要特别注意情绪管理哦~ 可能会有一些烦心事困扰你，但别担心，这都是在考验你呢。保持平和的心态，困难很快就会过去的~`
+        ],
+        6: [
+          `${name}今天的运势比较低迷... 但别灰心！这是调整自己的好时机。遇到不顺的时候，就当是在积累经验吧。保持低调，多休息，明天又是新的一天~`,
+          `今天的${name}要格外小心哦。可能会遇到一些挑战，但请相信，这都是在让你变得更强大。不要轻易放弃，黎明前最黑暗，但曙光即将到来~`,
+          `${name}今天可能会有些不如意的事情发生... 但这并不意味着什么。每个人都会有低谷期，重要的是如何度过。今天适合静心养性，不要太勉强自己~`
+        ]
+      };
+      return texts[luck][hash(name) % 3];
+    }
+
+    // 生成数据
+    function generate(name, birthday) {
+      const date = new Date();
+      const h = hash(name + birthday + date.toISOString());
+      const luck = h % 7;
+
+      return {
+        luck: luckLevels[luck],
+        suitable: shuffle(suitable).slice(0, 4).join('、'),
+        avoid: shuffle(avoid).slice(0, 3).join('、'),
+        direction: directions[h % 8],
+        color: colors[(h >> 3) % colors.length],
+        numbers: [rand(1, 9), rand(1, 9), rand(1, 9)].filter((v, i, a) => a.indexOf(v) === i).slice(0, 2).join('、'),
+        hours: hours.map((t, i) => ({
+          time: t + '时',
+          good: hash(date.toISOString() + i) % 3 !== 0
+        }))
+      };
+    }
+
+    // 显示视图
+    function show(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+    }
+
+    // 显示结果
+    function showResult(name, birthday, anonymous) {
+      const data = generate(name, birthday);
+      const date = new Date();
+
+      document.getElementById('result-date').textContent =
+        `星辰历 · ${date.getFullYear()}年${date.getMonth() + 1}月`;
+      document.getElementById('luck-name').textContent = data.luck.name;
+      document.getElementById('glow1').style.stopColor = data.luck.color1;
+      document.getElementById('glow2').style.stopColor = data.luck.color2;
+      document.getElementById('info-date').textContent =
+        `${date.getMonth() + 1}月${date.getDate()}日`;
+      document.getElementById('info-yi').textContent = data.suitable;
+      document.getElementById('info-ji').textContent = data.avoid;
+      document.getElementById('fortune-user').textContent =
+        anonymous ? '小可爱' : name;
+      document.getElementById('fortune-text').textContent = genFortune(name, data.luck.name === '大吉' ? 0 : data.luck.name === '中吉' ? 1 : data.luck.name === '小吉' ? 2 : data.luck.name === '吉' ? 3 : data.luck.name === '末吉' ? 4 : data.luck.name === '凶' ? 5 : 6);
+      document.getElementById('detail-dir').textContent = data.direction;
+      document.getElementById('detail-color').textContent = data.color;
+      document.getElementById('detail-num').textContent = data.numbers;
+
+      document.getElementById('hour-grid').innerHTML = data.hours.map(h => `
+        <div class="hour-item">
+          <div class="hour-time">${h.time}</div>
+          <div class="hour-luck ${h.good ? 'hour-good' : 'hour-bad'}">${h.good ? '吉' : '平'}</div>
+        </div>
+      `).join('');
+
+      show('result-view');
+    }
+
+    // 创建星星
+    function createStars() {
+      const container = document.getElementById('stars');
+      for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 3 + 1;
+        star.style.cssText = `
+          width: ${size}px;
+          height: ${size}px;
+          left: ${Math.random() * 100}%;
+          top: ${Math.random() * 100}%;
+          --opacity: ${Math.random() * 0.5 + 0.3};
+          --duration: ${Math.random() * 3 + 2}s;
+          animation-delay: ${Math.random() * 3}s;
+        `;
+        container.appendChild(star);
+      }
+    }
+
+    // 创建流星
+    function createShootingStar() {
+      const container = document.getElementById('shooting-stars');
+      const star = document.createElement('div');
+      star.className = 'shooting-star';
+      star.style.cssText = `
+        top: ${Math.random() * 30}%;
+        left: ${Math.random() * 50}%;
+        animation-duration: ${Math.random() * 1 + 1}s;
+        animation-delay: ${Math.random() * 3}s;
+      `;
+      container.appendChild(star);
+      setTimeout(() => star.remove(), 3000);
+    }
+
+    // 创建气泡
+    function createBubble() {
+      const container = document.getElementById('bubbles');
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      const size = Math.random() * 30 + 10;
+      bubble.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        left: ${Math.random() * 100}%;
+        animation-duration: ${Math.random() * 10 + 8}s;
+        animation-delay: ${Math.random() * 5}s;
+      `;
+      container.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 18000);
+    }
+
+    // 初始化
+    createStars();
+    setInterval(createShootingStar, 3000);
+    setInterval(createBubble, 2000);
+
+    // 表单提交
+    document.getElementById('fortune-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('user-name');
+      const birthday = document.getElementById('user-birthday');
+      let valid = true;
+
+      if (!name.value.trim()) {
+        name.classList.add('error');
+        document.getElementById('name-error').classList.add('visible');
+        valid = false;
+      } else {
+        name.classList.remove('error');
+        document.getElementById('name-error').classList.remove('visible');
+      }
+
+      if (!birthday.value) {
+        birthday.classList.add('error');
+        document.getElementById('birthday-error').classList.add('visible');
+        valid = false;
+      } else {
+        birthday.classList.remove('error');
+        document.getElementById('birthday-error').classList.remove('visible');
+      }
+
+      if (valid) {
+        show('loading-view');
+        setTimeout(() => showResult(name.value.trim(), birthday.value, false), 3000);
+      }
+    });
+
+    // 匿名
+    document.getElementById('anonymous-btn').addEventListener('click', function() {
+      const names = ['小星星', '月光宝', '云朵儿', '彩虹糖', '泡泡鱼'];
+      const n = names[Math.floor(Math.random() * names.length)];
+      const d = new Date(2000, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+      show('loading-view');
+      setTimeout(() => showResult(n, d.toISOString().split('T')[0], true), 3000);
+    });
+
+    // 重玩
+    document.getElementById('replay-btn').addEventListener('click', function() {
+      document.getElementById('user-name').value = '';
+      document.getElementById('user-birthday').value = '';
+      show('input-view');
+    });
+
+    // 输入事件
+    document.getElementById('user-name').addEventListener('input', function() {
+      this.classList.remove('error');
+      document.getElementById('name-error').classList.remove('visible');
+    });
+
+    document.getElementById('user-birthday').addEventListener('change', function() {
+      this.classList.remove('error');
+      document.getElementById('birthday-error').classList.remove('visible');
+    });
+  </script>
+</body>
+</html>
